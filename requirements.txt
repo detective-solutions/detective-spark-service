@@ -1,0 +1,6 @@
+wheel
+pypandoc
+py4j==0.10.7
+pyspark==2.4.4
+databricks-connect==6.3
+

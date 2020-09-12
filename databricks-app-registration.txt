@@ -1,0 +1,7 @@
+ClientID: 26b7089b-33fc-4750-a362-ddd29d66621e
+5dc4b7a2-3c53-4a78-a36f-811007e7974c
+
+DirectoryID: a94b1445-0263-46a8-a8ac-d98a4022e2a8
+
+
+detectivetestdatabricksKey: 8COwCjK5~3E1T5juN4~-_2AczW~L.271if
