@@ -128,7 +128,7 @@ RUN cd /usr/local/bin \
 	&& ln -s python3-config python-config
 
 # if this is called "PIP_VERSION", pip explodes with "ValueError: invalid truth value '<VERSION>'"
-ENV PYTHON_PIP_VERSION 19.3.1
+ENV PYTHON_PIP_VERSION 20.2.3
 # https://github.com/pypa/get-pip
 ENV PYTHON_GET_PIP_URL https://github.com/pypa/get-pip/raw/ffe826207a010164265d9cc807978e3604d18ca0/get-pip.py
 ENV PYTHON_GET_PIP_SHA256 b86f36cc4345ae87bfd4f10ef6b2dbfa7a872fbff70608a1e43944d283fd0eee
@@ -154,7 +154,7 @@ RUN set -ex; \
 	rm -f get-pip.py
 
 # pip install requirements from python side
-RUN pip install databricks-connect==6.3.0
+RUN pip install databricks-connect==6.4
 RUN pip install six
 RUN pip install flask==0.12
 RUN pip install flask_restful==0.3.5
@@ -166,10 +166,10 @@ RUN echo '{}' > ~/.databricks-connect
 # COPY docker-entrypoint.sh /tmp/
 
 # Copy Example Script
-COPY .. /tmp/
+COPY . /tmp/
 
 ### install python moudles
-# RUN pip install -r /tmp/requirements.txt
+RUN pip install -r /tmp/requirements.txt
 
 ####
 #### OPTIONAL : 4. SET JAVA_HOME environment variable, uncomment the line below if you need it
@@ -180,8 +180,8 @@ COPY .. /tmp/
 
 ENV DATABRICKS_ADDRESS='https://adb-4677518036746641.1.azuredatabricks.net/'
 ENV DATABRICKS_API_TOKEN='dapi3fa666d3a763bb597a11175431e002e7'
-ENV DATABRICKS_CLUSTER_ID='0630-173055-tomes833'
-ENV DATABRICKS_ORG_ID=467751803674664
-ENV DATABRICKS_PORT=15001
+ENV DATABRICKS_CLUSTER_ID='0913-131349-chant593'
+ENV DATABRICKS_ORG_ID=4677518036746641
+ENV DATABRICKS_PORT=8787
 
 CMD python /tmp/test.py

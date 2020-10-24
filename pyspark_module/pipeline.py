@@ -15,15 +15,12 @@ class Pipeline:
         self.pipe = pipe
         self.functions = {key: value for key, value in inspect.getmembers(PipelineFunctions()) if inspect.isfunction(value)}
 
-    @staticmethod
-    def to_json(df):
-        data_list = df.limit(1000).toJSON().collect()
-        data_list = [json.loads(x) for x in data_list]
+    def to_json(self, df):
+        data_list = df.limit(1000).collect()
 
-        # create a single dict out of the existing data frame
-        data = {}
-        for column in data_list[0].keys():
-            data[column] = [row[column] for row in data_list]
+        data = dict()
+        for column in df.columns:
+            data[column] = [str(x[column]) for x in data_list]
 
         return data
 

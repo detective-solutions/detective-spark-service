@@ -7,7 +7,7 @@
 import json
 from flask import Flask, request
 from flask_restful import Resource, Api
-from detective_spark_module.pyspark_module.pipeline import Pipeline
+from pyspark_module.pipeline import Pipeline
 
 app = Flask(__name__)
 api = Api(app)
@@ -20,27 +20,12 @@ class DataBricksRequest(Resource):
 
         request_data = json.loads(request.data)
 
+        # get just the url from received data
         url = request_data["url"]
 
-        """
-        stages = [
-            {
-                "type": "select_columns",
-                "params": {
-                    "columns": ["year", "exch_usd"]
-                }
-            },
-            {
-                "type": "row_filter",
-                "params": {
-                    "columns": ["year"],
-                    "filter": ["=="],
-                    "values": [1870]
-                }
-            }
-        ]
-        """
-        stages = []
+        # set empty stages since the test will just return the data set
+        stages = request_data["stages"]
+
         pipe = Pipeline(stages)
         df = pipe.get_view(url, "ddl")
 
