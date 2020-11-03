@@ -54,7 +54,22 @@ class Pipeline:
     def add_index(self, index, stage):
         self.pipe.insert(index, stage)
 
-    def get_view(self, path, mount):
+    def read_path(self, path, spark):
+
+        # check if path includes file or folder
+        if path.endswith(".csv"):
+            print("PATH CSV")
+            return spark.read.csv(path, header=True, mode="DROPMALFORMED")
+        elif path.endswith("/"):
+            print("PATH PARQUET")
+            return spark.read.parquet(path)
+        elif path.endswith(".json"):
+            print("PATH JSON")
+            return None
+        else:
+            return None
+
+    def get_view_deprecated(self, path, mount):
         spark = SparkSession.builder.getOrCreate()
         url = self.create_mount_url(path, mount)
         df = spark.read.csv(url, header=True, mode="DROPMALFORMED")
@@ -65,3 +80,31 @@ class Pipeline:
                 # schema = dict(zip)
 
         return self.to_json(df)
+
+    def get_view(self, path, mount):
+
+        print(path, mount, self.pipe)
+        spark = SparkSession.builder.getOrCreate()
+        url = self.create_mount_url(path, mount)
+
+        df = spark.read.csv(url, header=True, mode="DROPMALFORMED")# self.read_path(url, spark)
+        if df is not None:
+            for i, stage in enumerate(self.pipe):
+                if stage["attribute"]["status"] == "update":
+                    df = self.functions[stage["attribute"]["type"]](
+                        df, stage["attribute"]["params"]
+                    )
+                    schema = dict(df.dtypes)
+                    shape = {"rows": df.count(), "columns": len(df.columns)}
+                    report = ["placeholder"]
+
+                    self.pipe[i]["attribute"]["data"] = self.to_json(df)
+                    self.pipe[i]["attribute"]["meta"]["schema"] = schema
+                    self.pipe[i]["attribute"]["meta"]["shape"] = shape
+                    self.pipe[i]["attribute"]["meta"]["report"] = report
+                    self.pipe[i]["attribute"]["status"] = "state"
+
+            return self.pipe
+                    # yield i, df.limit(1000).to_json(), schema, report, shape
+        else:
+            return None

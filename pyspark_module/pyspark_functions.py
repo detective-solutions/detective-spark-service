@@ -30,8 +30,48 @@ class PipelineFunctions:
 
     @staticmethod
     def row_filter(df, conditions):
-        query_string = f"{conditions['columns'][0]}{conditions['filter'][0]}{conditions['values'][0]}"
-        return df.filter(query_string)
+
+        try:
+            # check whether conditions can be valid
+            values, columns, filters = list(), list(), list()
+            for i, entry in enumerate(conditions["columns"]):
+                if entry in df.columns:
+                    columns += [conditions["columns"][i]]
+                    filters += [conditions["filters"][i]]
+                    values += [str(conditions["values"][i])]
+
+            # shorten values
+            val_count = len(values)
+            col_count = len(columns)
+
+            if val_count < col_count:
+                columns = columns[:val_count]
+                filters = filters[:val_count]
+
+            elif col_count < val_count:
+                columns = columns[:col_count]
+                filters = filters[:col_count]
+
+            filter_set = list(zip(columns, filters, values))
+
+
+            condition = [
+                f"{x[0]}{x[1]}{repr(x[2])}"
+                for x in filter_set
+
+            ]
+            """
+            condition += [
+                f"{x[0]}{x[1]}{x[2]}"
+                for x in filter_set
+                if x[2].isnumeric() is False
+            ]
+            """
+            print("((" + ")&(".join(y for y in condition) + "))")
+            return df.filter("(" + ")AND(".join(y for y in condition) + ")")
+
+        except (KeyError, ValueError):
+            return df
 
     # rename columns
     @staticmethod
