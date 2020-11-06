@@ -69,25 +69,12 @@ class Pipeline:
         else:
             return None
 
-    def get_view_deprecated(self, path, mount):
-        spark = SparkSession.builder.getOrCreate()
-        url = self.create_mount_url(path, mount)
-        df = spark.read.csv(url, header=True, mode="DROPMALFORMED")
-
-        for i, stage in enumerate(self.pipe):
-            df = self.functions[stage["type"]](df, stage["params"])
-            # if stage["status"] == "update":
-                # schema = dict(zip)
-
-        return self.to_json(df)
-
     def get_view(self, path, mount):
 
-        print(path, mount, self.pipe)
         spark = SparkSession.builder.getOrCreate()
         url = self.create_mount_url(path, mount)
+        df = spark.read.format("csv").option("header", True).csv(url)
 
-        df = spark.read.csv(url, header=True, mode="DROPMALFORMED")# self.read_path(url, spark)
         if df is not None:
             for i, stage in enumerate(self.pipe):
                 if stage["attribute"]["status"] == "update":
@@ -105,6 +92,5 @@ class Pipeline:
                     self.pipe[i]["attribute"]["status"] = "state"
 
             return self.pipe
-                    # yield i, df.limit(1000).to_json(), schema, report, shape
         else:
             return None
