@@ -21,7 +21,7 @@ class DataBricksRequest(Resource):
         request_data = json.loads(request.data)
 
         # get just the url from received data
-        url = request_data["url"]
+        url = request_data["data_id"]
 
         # set empty stages since the test will just return the data set
         stages = request_data["stages"]
@@ -39,40 +39,8 @@ class DataBricksRequest(Resource):
         return {'file': ['product-service', "ddl"]}
 
 
-class PlainDataRequest(Resource):
-
-    def post(self):
-
-        request_data = json.loads(request.data)
-
-        # get url
-        url = request_data["url"]
-
-        stages = [
-            {
-                'attribute': {
-                    'type': 'empty_handover',
-                    'params': {'blank_key': 'blank_value'},
-                    'status': 'update',
-                    'meta': {'schema': 'None', 'shape': 'None', 'report': 'None'},
-                    'loading': True,
-                    'applied': True,
-                    'data': dict()}
-                }
-        ]
-        pipe = Pipeline(stages)
-        df = pipe.get_view(url, "ddl")
-
-        response_body = {
-            "data": df
-        }
-
-        return response_body
-
-
 # url path
 api.add_resource(DataBricksRequest, '/ddl')
-api.add_resource(PlainDataRequest, '/init')
 
 # run app
 if __name__ == '__main__':

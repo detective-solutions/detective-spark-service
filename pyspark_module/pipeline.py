@@ -26,7 +26,9 @@ class Pipeline:
 
     @staticmethod
     def create_mount_url(path, mount, transform=None, local=False, is_file=False):
-        # TODO: create an explicit method for it
+
+        # remove the first entry since this is related to the detective instance name
+        path = "/".join(x for x in path.split('/')[2:])
         path = (
             path.replace("mnt/", "").replace("dbfs:/", "").replace("/dbfs/", "").replace("//", "/")
         )
@@ -93,4 +95,10 @@ class Pipeline:
 
             return self.pipe
         else:
-            return None
+            for i, stage in enumerate(self.pipe):
+                if stage["attribute"]["status"] == "update":
+                    report = ["no data found with the current identifier"]
+                    self.pipe[i]["attribute"]["meta"]["report"] = report
+                    self.pipe[i]["attribute"]["status"] = "state"
+
+            return self.pipe
