@@ -60,14 +60,7 @@ class PipelineFunctions:
                 for x in filter_set
 
             ]
-            """
-            condition += [
-                f"{x[0]}{x[1]}{x[2]}"
-                for x in filter_set
-                if x[2].isnumeric() is False
-            ]
-            """
-            print("((" + ")&(".join(y for y in condition) + "))")
+
             return df.filter("(" + ")AND(".join(y for y in condition) + ")")
 
         except (KeyError, ValueError):
@@ -142,7 +135,7 @@ class PipelineFunctions:
     # group data and apply a basic method <i class="fas fa-calculator"></i>
     @staticmethod
     def group_data(df, conditions):
-        df = df.groupby(conditions["columns"]).agg(
+        df = df.groupBy(conditions["columns"]).agg(
             conditions["values"]
         )
 
@@ -162,34 +155,35 @@ class PipelineFunctions:
     # sort data based on columns <i class="fas fa-sort-amount-down-alt"></i>
     @staticmethod
     def sort_data(df, conditions):
-        order = True if conditions['filters'][0] == 'ascending' else False
-        return df.sort_values(by=conditions['columns'], ascending=order)
+        sort = lambda sort_type, column: f.col(column).asc() if sort_type == 'ascending' else f.col(column).desc()
+        newDf = df.orderBy(*[sort(conditions['filters'][0], column) for column in conditions['columns']])
+        return newDf
 
     # drop a small chunk of columns <i class="fas fa-tint"></i>
     @staticmethod
     def drop_columns(df, conditions):
-        return df.drop(columns=conditions['columns'])
+        return df.drop(*conditions['columns'])
 
     # fillna  <i class="fas fa-star-half-alt"></i>
     @staticmethod
     def fill_missing_values(df, conditions):
-        for index, column in enumerate(conditions['columns']):
-            df[column] = df[column].fillna(conditions['values'][index])
-        return df
+
+        mapping = dict(zip(conditions['columns'], conditions['values']))
+        return df.fillna(mapping)
 
     # drop duplicated rows - <i class="fas fa-capsules"></i>
     @staticmethod
     def drop_duplicates(df, conditions):
         if conditions["columns"][0] != 'None':
-            return df.drop_duplicates(subset=conditions["columns"])
+            return df.dropDuplicates(conditions["columns"])
         else:
-            return df.drop_duplicates()
+            return df.dropDuplicates()
 
     # drop unfilled or missing values - <i class="fas fa-eraser"></i>
     @staticmethod
     def dropna(df, conditions):
         if conditions["columns"][0] != 'None':
-            return df.dropna(subset=conditions["columns"])
+            return df.dropna(thresh=1, subset=conditions["columns"])
         else:
             return df.dropna()
 
