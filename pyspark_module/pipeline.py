@@ -1,5 +1,4 @@
 # import standard modules
-import json
 import inspect
 
 # import third party modules
@@ -10,10 +9,13 @@ from .pyspark_functions import PipelineFunctions
 
 
 class Pipeline:
-
     def __init__(self, pipe):
         self.pipe = pipe
-        self.functions = {key: value for key, value in inspect.getmembers(PipelineFunctions()) if inspect.isfunction(value)}
+        self.functions = {
+            key: value
+            for key, value in inspect.getmembers(PipelineFunctions())
+            if inspect.isfunction(value)
+        }
 
     def to_json(self, df):
         data_list = df.limit(1000).collect()
@@ -25,12 +27,18 @@ class Pipeline:
         return data
 
     @staticmethod
-    def create_mount_url(path, mount, transform=None, local=False, is_file=False):
+    def create_mount_url(
+        path, mount, transform=None, local=False, is_file=False
+    ):
 
-        # remove the first entry since this is related to the detective instance name
-        path = "/".join(x for x in path.split('/')[2:])
+        # remove the first entry since this is related to the
+        # detective instance name
+        path = "/".join(x for x in path.split("/")[2:])
         path = (
-            path.replace("mnt/", "").replace("dbfs:/", "").replace("/dbfs/", "").replace("//", "/")
+            path.replace("mnt/", "")
+            .replace("dbfs:/", "")
+            .replace("/dbfs/", "")
+            .replace("//", "/")
         )
         path = f"/mnt/{mount}/" + path + "/"
         path = path.replace("//", "/")
