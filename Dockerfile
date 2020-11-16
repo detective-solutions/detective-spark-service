@@ -53,4 +53,4 @@ RUN if [ ! -d "/docker-java-home" ]; then ln -s "${JAVA_HOME}" /docker-java-home
 
 WORKDIR /tmp
 
-CMD ["/bin/bash", "entrypoint.sh"]
+CMD ["/bin/bash", "docker-entrypoint.sh"]

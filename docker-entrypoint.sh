@@ -1,4 +1,6 @@
+#!/bin/bash
+
 conda init bash \
     && . ~/.bashrc \
     && conda activate dbconnect \
-    && python test.py
+    && gunicorn --bind 0.0.0.0:5001 wsgi:app \

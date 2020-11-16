@@ -1,4 +1,3 @@
-
 # TODO: check if it is possible to set env variables within this code
 
 # docker build -t databricks-connect-test .
@@ -14,7 +13,6 @@ api = Api(app)
 
 
 class DataBricksRequest(Resource):
-
     def post(self):
         print(request.data)
 
@@ -29,19 +27,13 @@ class DataBricksRequest(Resource):
         pipe = Pipeline(stages)
         df = pipe.get_view(url, "ddl")
 
-        response_body = {
-            "data": df
-        }
+        response_body = {"data": df}
 
         return response_body
 
     def get(self):
-        return {'file': ['product-service', "ddl"]}
+        return {"file": ["product-service", "ddl"]}
 
 
 # url path
-api.add_resource(DataBricksRequest, '/ddl')
-
-# run app
-if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5001, debug=True)
+api.add_resource(DataBricksRequest, "/ddl")
