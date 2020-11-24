@@ -15,15 +15,16 @@ api = Api(app)
 class DataBricksRequest(Resource):
     def post(self):
         try:
-            print(request.data)
 
             request_data = json.loads(request.data)
+            print(request_data)
 
             # get just the url from received data
             url = request_data["data_id"]
 
             # set empty stages since the test will just return the data set
             stages = request_data["stages"]
+            print(stages)
 
             pipe = Pipeline(stages)
             df = pipe.get_view(url, "ddl")
@@ -33,7 +34,7 @@ class DataBricksRequest(Resource):
             return response_body
         except Exception as exc:
             print("REQUEST FAIL", exc)
-            return {"data": {"error": [0]}}
+            return {"data": {"error": [exc]}}
 
 
     def get(self):
