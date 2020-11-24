@@ -14,22 +14,27 @@ api = Api(app)
 
 class DataBricksRequest(Resource):
     def post(self):
-        print(request.data)
+        try:
+            print(request.data)
 
-        request_data = json.loads(request.data)
+            request_data = json.loads(request.data)
 
-        # get just the url from received data
-        url = request_data["data_id"]
+            # get just the url from received data
+            url = request_data["data_id"]
 
-        # set empty stages since the test will just return the data set
-        stages = request_data["stages"]
+            # set empty stages since the test will just return the data set
+            stages = request_data["stages"]
 
-        pipe = Pipeline(stages)
-        df = pipe.get_view(url, "ddl")
+            pipe = Pipeline(stages)
+            df = pipe.get_view(url, "ddl")
 
-        response_body = {"data": df}
+            response_body = {"data": df}
 
-        return response_body
+            return response_body
+        except Exception as exc:
+            print("REQUEST FAIL", exc)
+            return {"data": {"error": [0]}}
+
 
     def get(self):
         return {"file": ["product-service", "ddl"]}
